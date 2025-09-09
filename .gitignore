@@ -1,0 +1,9 @@
+/.bundle
+/log/*
+/tmp/*
+/db/*.sqlite3
+/node_modules
+/.env
+/vendor/bundle
+/public/packs
+.DS_Store
