@@ -1,66 +1,114 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import type { User } from './types';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import AuthCallback from "./pages/AuthCallback";
+import API, { setToken } from "./api";
+import type { User } from "./types";
+import "./App.css";
 
-function App() {
+export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load user from localStorage if available
+  // Load user from /me if token exists
   useEffect(() => {
-    const token = localStorage.getItem('api_token');
+    const token = localStorage.getItem("api_token");
     if (token) {
-      // You could call an API like /me to fetch the real user by token
-      // For now, just keep a placeholder
-      setUser({
-        id: 0,
-        name: 'Anonymous',
-        email: '',
-        api_token: token,
-        created_at: '',
-        updated_at: ''
-      });
+      setToken(token);
+      API.get<{ user: User }>("/users/me")
+        .then((res) => setUser(res.data.user))
+        .catch((err) => {
+          if (401 !== err.response?.status) {
+            console.error(err);
+          }
+          localStorage.removeItem("api_token");
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, []);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <Router>
       <Routes>
-        {/* If logged in, redirect login/register → dashboard */}
-        <Route
-          path="/login"
-          element={user ? <Navigate to="/" replace /> : <Login onLogin={setUser} />}
-        />
-        <Route
-          path="/register"
-          element={user ? <Navigate to="/" replace /> : <Register onRegister={setUser} />}
-        />
-
-        {/* Dashboard is the main ("/") route */}
+        {/* Dashboard (home) */}
         <Route
           path="/"
           element={
             user ? (
-              <Dashboard
-                user={user}
-                onLogout={() => {
-                  localStorage.removeItem('api_token');
-                  setUser(null);
-                }}
-              />
+              <div className="dashboard-container">
+                <Dashboard
+                  user={user}
+                  onLogout={() => {
+                    localStorage.removeItem("api_token");
+                    setUser(null);
+                  }}
+                />
+              </div>
             ) : (
               <Navigate to="/login" replace />
             )
           }
         />
 
-        {/* Catch-all: if unknown route, go to main page */}
+        {/* Login page */}
+        <Route
+          path="/login"
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <div className="auth-container">
+                <div className="auth-card">
+                  <h2>Login</h2>
+                  <Login onLogin={setUser} />
+                  <button
+                    className="toggle-link"
+                    onClick={() => (window.location.href = "/register")}
+                  >
+                    Don&apos;t have an account? Register
+                  </button>
+                </div>
+              </div>
+            )
+          }
+        />
+
+        {/* Register page */}
+        <Route
+          path="/register"
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <div className="auth-container">
+                <div className="auth-card">
+                  <h2>Register</h2>
+                  <Register onRegister={setUser} />
+                  <button
+                    className="toggle-link"
+                    onClick={() => (window.location.href = "/login")}
+                  >
+                    Already have an account? Login
+                  </button>
+                </div>
+              </div>
+            )
+          }
+        />
+
+        {/* OAuth callback */}
+        <Route path="/auth/callback" element={<AuthCallback onAuth={setUser} />} />
+
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;

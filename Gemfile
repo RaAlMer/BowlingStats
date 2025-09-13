@@ -40,4 +40,9 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+# Load environment variables from .env for development and test environments
+gem 'dotenv-rails', groups: [:development, :test]
 
+# Google authentication
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
