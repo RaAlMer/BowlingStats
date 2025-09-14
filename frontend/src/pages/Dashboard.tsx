@@ -60,7 +60,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <button onClick={onLogout}>Logout</button>
       </div>
 
-      <h3>Your games — avg: {avg}</h3>
+      <h3>Average: {avg}</h3>
 
       {/* Charts */}
       <div className="dashboard-charts">
