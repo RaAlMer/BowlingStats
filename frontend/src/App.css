@@ -231,8 +231,8 @@ button {
 
 .games-list li {
   display: flex;
-  flex-direction: column; /* change from row to column */
-  gap: 0.5rem;            /* spacing between score, date, and mini scorecard */
+  flex-direction: column;
+  gap: 0.5rem;
   padding: 1rem 1.25rem;
   border-bottom: 2px solid #eee;
   background: #f8fafc;
@@ -282,15 +282,6 @@ button {
 }
 
 /* Bowling Grid Layout */
-.bowling-grid {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1.5rem;
-  border: 2px solid #2d3748;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 .frames-header {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -437,7 +428,7 @@ button {
   transform: none;
 }
 
-/* === Bowling sheet grid === */
+/* Bowling sheet grid */
 .bowling-grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -666,9 +657,9 @@ button {
   gap: 2px;
   font-family: monospace;
   margin-top: 0.5rem;
-  max-width: 100%;         /* constrain to parent width */
-  overflow-x: auto;        /* horizontal scroll if too wide */
-  padding-bottom: 2px;     /* small padding to avoid cutting off bottom */
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
 /* Hide scrollbar on WebKit (optional) */
@@ -694,7 +685,7 @@ button {
   min-width: 36px;
   padding: 0.2rem;
   background: #f7fafc;
-  flex-shrink: 0;           /* prevent shrinking when overflow */
+  flex-shrink: 0;
 }
 
 .mini-frame.tenth-frame {
@@ -732,13 +723,13 @@ button {
   color: #1a202c; /* dark */
 }
 
+/* Responsive adjustments */
 @media(min-width: 1024px) {
   .dashboard-charts {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   body, html, #root {
     padding: 0.5rem;
@@ -804,3 +795,77 @@ button {
     height: 250px;
   }
 }
+
+@media (max-width: 425px) {
+  .bowling-grid,
+  .frames-header,
+  .frames,
+  .frame-totals {
+    overflow-x: auto;
+  }
+
+  .frames-header,
+  .frames,
+  .frame-totals {
+    grid-template-columns: repeat(10, minmax(40px, 1fr));
+    min-width: auto;
+  }
+
+  .frame {
+    min-height: 70px;
+    padding: 0.3rem;
+  }
+
+  .frame-10 .frame-rolls {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .roll-input {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .frame-total-display {
+    font-size: 0.85rem;
+    padding: 0.1rem;
+  }
+
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-wrapper {
+    height: 200px;
+  }
+
+  .games-list li {
+    padding: 0.75rem 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .games-list li span {
+    font-size: 0.85rem;
+  }
+
+  .mini-scorecard {
+    font-size: 0.7rem;
+    gap: 1px;
+  }
+
+  .mini-frame {
+    min-width: 28px;
+    padding: 0.15rem;
+  }
+
+  .mini-frame.tenth-frame {
+    min-width: 40px;
+  }
+
+  .mini-frame .rolls span {
+    min-width: 12px;
+    font-size: 0.7rem;
+  }
+}
+
