@@ -563,6 +563,19 @@ button {
   border: 2px solid #1a365d;
 }
 
+.games-month {
+  margin-top: 1.5rem;
+}
+
+.month-header {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #667eea;
+  padding-left: 0.5rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   body, html, #root {

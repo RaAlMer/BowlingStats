@@ -28,15 +28,16 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     load();
   }, []);
 
-  // Sort games by played_at (oldest first)
+  // Sort games oldest first
   const sortedGames = [...games].sort((a, b) => {
     const dateA = a.played_at ? new Date(a.played_at).getTime() : 0;
     const dateB = b.played_at ? new Date(b.played_at).getTime() : 0;
     return dateA - dateB;
   });
 
+  // Prepare data for chart
   const data = sortedGames.map((g, i) => ({
-    name: `Game ${i + 1}`, // sequential order instead of DB id
+    name: `Game ${i + 1}`,
     score: g.total_score ?? 0,
     date: g.played_at ? new Date(g.played_at).toLocaleDateString() : "",
   }));
@@ -47,6 +48,20 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         sortedGames.length
       ).toFixed(1)
     : 0;
+
+  // Group games by month/year
+  const groupedGames = sortedGames.reduce((acc, g, i) => {
+    const date = g.played_at ? new Date(g.played_at) : null;
+    const key = date
+    ? (() => {
+        const str = date.toLocaleString("default", { month: "short", year: "numeric" });
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      })()
+    : "Unknown";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push({ ...g, label: `Game ${i + 1}` });
+    return acc;
+  }, {} as Record<string, (Game & { label: string })[]>);
 
   return (
     <div className="dashboard-container">
@@ -84,19 +99,24 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         {sortedGames.length === 0 ? (
           <p>No games yet. Add your first game!</p>
         ) : (
-          <ul>
-            {sortedGames.map((g, i) => (
-              <li key={g.id}>
-                <span>Game {i + 1}</span>
-                <span>Score: {g.total_score ?? 0}</span>
-                <span>
-                  {g.played_at
-                    ? new Date(g.played_at).toLocaleDateString()
-                    : "N/A"}
-                </span>
-              </li>
-            ))}
-          </ul>
+          Object.entries(groupedGames).map(([month, games]) => (
+            <div key={month} className="games-month">
+              <h5 className="month-header">{month}</h5>
+              <ul>
+                {games.map((g) => (
+                  <li key={g.id}>
+                    <span>{g.label}</span>
+                    <span>Score: {g.total_score ?? 0}</span>
+                    <span>
+                      {g.played_at
+                        ? new Date(g.played_at).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
         )}
       </div>
     </div>
