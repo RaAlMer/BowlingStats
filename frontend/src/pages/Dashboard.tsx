@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../api";
 import type { Game, User } from "../types";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
 import NewGameForm from "../components/NewGameForm";
+import RollingAverageChart from "../components/RollingAverageChart";
+import ScoreDistributionChart from "../components/ScoreDistributionChart";
+import FrameBreakdownChart from "../components/FrameBreakdownChart";
+import StrikesSparesPieChart from "../components/StrikesSparesPieChart";
+import ChartWrapper from "../utils/ChartWrapper";
 
 interface DashboardProps {
   user: User;
@@ -34,13 +30,6 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     const dateB = b.played_at ? new Date(b.played_at).getTime() : 0;
     return dateA - dateB;
   });
-
-  // Prepare data for chart
-  const data = sortedGames.map((g, i) => ({
-    name: `Game ${i + 1}`,
-    score: g.total_score ?? 0,
-    date: g.played_at ? new Date(g.played_at).toLocaleDateString() : "",
-  }));
 
   const avg = sortedGames.length
     ? (
@@ -72,22 +61,35 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
       <h3>Your games — avg: {avg}</h3>
 
-      {/* Responsive Chart */}
-      <div className="chart-wrapper">
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="score"
-              stroke="#667eea"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Charts */}
+      <div className="dashboard-charts">
+        <ChartWrapper 
+          title="Rolling Average" 
+          description="Shows your rolling average score over the last few games. Useful to see trends and improvement."
+        >
+          <RollingAverageChart games={sortedGames} />
+        </ChartWrapper>
+
+        <ChartWrapper 
+          title="Score Distribution" 
+          description="Shows how often you score within certain ranges. Helps identify consistency or peaks."
+        >
+          <ScoreDistributionChart games={sortedGames} />
+        </ChartWrapper>
+
+        <ChartWrapper 
+          title="Frame Breakdown" 
+          description="Shows your average score per frame. Helps identify which frames you do best in or need improvement."
+        >
+          <FrameBreakdownChart games={sortedGames} />
+        </ChartWrapper>
+
+        <ChartWrapper 
+          title="Strikes, Spares, Opens" 
+          description="Pie chart showing your proportion of strikes, spares, and open frames. Helps evaluate performance patterns."
+        >
+          <StrikesSparesPieChart games={sortedGames} />
+        </ChartWrapper>
       </div>
 
       {/* Add game */}

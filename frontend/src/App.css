@@ -576,6 +576,95 @@ button {
   padding-left: 0.5rem;
 }
 
+/* Dashboard charts container */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* ChartWrapper modal overlay */
+.chart-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* ChartWrapper modal content */
+.chart-modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  position: relative;
+}
+
+/* Close button */
+.chart-modal-content button.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #667eea;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.chart-modal-content button.close-btn:hover {
+  background: #5a67d8;
+}
+
+/* ChartWrapper title and ? button */
+.chart-wrapper-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.chart-wrapper-header h4 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.chart-wrapper-header button.info-btn {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #667eea;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
+}
+
+.chart-wrapper-header button.info-btn:hover {
+  color: #5a67d8;
+}
+
+@media(min-width: 1024px) {
+  .dashboard-charts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   body, html, #root {

@@ -14,6 +14,7 @@ export interface Game {
   total_score: number | null;
   created_at: string;
   updated_at: string;
+  rolls?: Roll[];
 }
 
 export interface Roll {
