@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import API from '../api';
-import type { Game, User } from '../types';
+import { useEffect, useState } from "react";
+import API from "../api";
+import type { Game, User } from "../types";
 import {
   LineChart,
   Line,
@@ -9,7 +9,7 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import NewGameForm from "../components/NewGameForm";
 
 interface DashboardProps {
@@ -22,21 +22,29 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
   useEffect(() => {
     async function load() {
-      const res = await API.get<Game[]>('/games');
+      const res = await API.get<Game[]>("/games");
       setGames(res.data);
     }
     load();
   }, []);
 
-  const data = games.map((g) => ({
-    name: `Game ${g.id}`,
+  // Sort games by played_at (oldest first)
+  const sortedGames = [...games].sort((a, b) => {
+    const dateA = a.played_at ? new Date(a.played_at).getTime() : 0;
+    const dateB = b.played_at ? new Date(b.played_at).getTime() : 0;
+    return dateA - dateB;
+  });
+
+  const data = sortedGames.map((g, i) => ({
+    name: `Game ${i + 1}`, // sequential order instead of DB id
     score: g.total_score ?? 0,
-    date: g.played_at ? new Date(g.played_at).toLocaleDateString() : '',
+    date: g.played_at ? new Date(g.played_at).toLocaleDateString() : "",
   }));
 
-  const avg = games.length
+  const avg = sortedGames.length
     ? (
-        games.reduce((s, g) => s + (g.total_score ?? 0), 0) / games.length
+        sortedGames.reduce((s, g) => s + (g.total_score ?? 0), 0) /
+        sortedGames.length
       ).toFixed(1)
     : 0;
 
@@ -57,7 +65,12 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="score" stroke="#667eea" strokeWidth={2} />
+            <Line
+              type="monotone"
+              dataKey="score"
+              stroke="#667eea"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -68,15 +81,19 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       {/* Games list */}
       <div className="games-list">
         <h4>Game history</h4>
-        {games.length === 0 ? (
+        {sortedGames.length === 0 ? (
           <p>No games yet. Add your first game!</p>
         ) : (
           <ul>
-            {games.map((g) => (
+            {sortedGames.map((g, i) => (
               <li key={g.id}>
-                <span>Game {g.id}</span>
+                <span>Game {i + 1}</span>
                 <span>Score: {g.total_score ?? 0}</span>
-                <span>{g.played_at ? new Date(g.played_at).toLocaleDateString() : 'N/A'}</span>
+                <span>
+                  {g.played_at
+                    ? new Date(g.played_at).toLocaleDateString()
+                    : "N/A"}
+                </span>
               </li>
             ))}
           </ul>
