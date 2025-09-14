@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
+import NewGameForm from "../components/NewGameForm";
 
 interface DashboardProps {
   user: User;
@@ -60,6 +61,9 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Add game */}
+      <NewGameForm onGameCreated={(game) => setGames([...games, game])} />
 
       {/* Games list */}
       <div className="games-list">

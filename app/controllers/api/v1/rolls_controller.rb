@@ -11,7 +11,8 @@ module Api
       def create
         game = current_user.games.find(params[:game_id])
         roll = game.rolls.create!(roll_params)
-        render json: roll, status: :created
+        game.update!(total_score: GameScorer.new(game.rolls).total_score)
+        render json: game.as_json(include: :rolls), status: :created
       end
 
       private
