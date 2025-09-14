@@ -7,6 +7,7 @@ import ScoreDistributionChart from "../components/ScoreDistributionChart";
 import FrameBreakdownChart from "../components/FrameBreakdownChart";
 import StrikesSparesPieChart from "../components/StrikesSparesPieChart";
 import ChartWrapper from "../utils/ChartWrapper";
+import MiniScorecard from "../utils/MiniScorecard";
 
 interface DashboardProps {
   user: User;
@@ -110,10 +111,9 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                     <span>{g.label}</span>
                     <span>Score: {g.total_score ?? 0}</span>
                     <span>
-                      {g.played_at
-                        ? new Date(g.played_at).toLocaleDateString()
-                        : "N/A"}
+                      {g.played_at ? new Date(g.played_at).toLocaleDateString() : "N/A"}
                     </span>
+                    <MiniScorecard rolls={g.rolls ?? []} />
                   </li>
                 ))}
               </ul>

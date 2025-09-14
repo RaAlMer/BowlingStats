@@ -231,7 +231,8 @@ button {
 
 .games-list li {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column; /* change from row to column */
+  gap: 0.5rem;            /* spacing between score, date, and mini scorecard */
   padding: 1rem 1.25rem;
   border-bottom: 2px solid #eee;
   background: #f8fafc;
@@ -657,6 +658,78 @@ button {
 
 .chart-wrapper-header button.info-btn:hover {
   color: #5a67d8;
+}
+
+/* Mini scorecard in game list */
+.mini-scorecard {
+  display: flex;
+  gap: 2px;
+  font-family: monospace;
+  margin-top: 0.5rem;
+  max-width: 100%;         /* constrain to parent width */
+  overflow-x: auto;        /* horizontal scroll if too wide */
+  padding-bottom: 2px;     /* small padding to avoid cutting off bottom */
+}
+
+/* Hide scrollbar on WebKit (optional) */
+.mini-scorecard::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mini-scorecard::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.mini-scorecard::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mini-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  min-width: 36px;
+  padding: 0.2rem;
+  background: #f7fafc;
+  flex-shrink: 0;           /* prevent shrinking when overflow */
+}
+
+.mini-frame.tenth-frame {
+  min-width: 50px;
+}
+
+.mini-frame .rolls {
+  display: flex;
+  gap: 1px;
+  justify-content: center;
+}
+
+.mini-frame .rolls span {
+  min-width: 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1.1;
+}
+
+/* Color coding */
+.mini-frame .rolls span.strike {
+  color: #e53e3e; /* red */
+}
+
+.mini-frame .rolls span.spare {
+  color: #3182ce; /* blue */
+}
+
+.mini-frame .rolls span.miss {
+  color: #718096; /* gray */
+}
+
+.mini-frame .rolls span.number {
+  color: #1a202c; /* dark */
 }
 
 @media(min-width: 1024px) {

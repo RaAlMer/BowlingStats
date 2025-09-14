@@ -44,3 +44,14 @@ export function calculateFrameTotals(rolls: number[]): number[] {
 
   return totals;
 }
+
+export function formatRoll(roll: number, frame: number[], idx: number): string {
+  // Strike: any roll of 10 is X
+  if (roll === 10) return "X";
+  // Spare: only for 2nd or 3rd roll when sum of previous roll(s) < 10
+  if (idx > 0 && frame[idx - 1] + roll === 10) return "/";
+  // Miss
+  if (roll === 0) return "-";
+  // Otherwise, number
+  return roll.toString();
+}
