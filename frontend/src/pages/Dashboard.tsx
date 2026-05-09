@@ -8,6 +8,8 @@ import FrameBreakdownChart from "../components/FrameBreakdownChart";
 import StrikesSparesPieChart from "../components/StrikesSparesPieChart";
 import ChartWrapper from "../utils/ChartWrapper";
 import MiniScorecard from "../utils/MiniScorecard";
+import EditGameForm from "../components/EditGameForm";
+import type { AxiosError } from "axios";
 
 interface DashboardProps {
   user: User;
@@ -16,6 +18,7 @@ interface DashboardProps {
 
 export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [games, setGames] = useState<Game[]>([]);
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -43,15 +46,41 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   const groupedGames = sortedGames.reduce((acc, g, i) => {
     const date = g.played_at ? new Date(g.played_at) : null;
     const key = date
-    ? (() => {
-        const str = date.toLocaleString("default", { month: "short", year: "numeric" });
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-      })()
-    : "Unknown";
+      ? (() => {
+          const str = date.toLocaleString("default", {
+            month: "short",
+            year: "numeric",
+          });
+          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        })()
+      : "Unknown";
     if (!acc[key]) acc[key] = [];
     acc[key].push({ ...g, label: `Game ${i + 1}` });
     return acc;
   }, {} as Record<string, (Game & { label: string })[]>);
+
+  const handleGameCreated = (game: Game) => {
+    setGames([...games, game]);
+  };
+
+  const handleGameUpdated = (updated: Game) => {
+    setGames(games.map((g) => (g.id === updated.id ? updated : g)));
+  };
+
+  const handleDeleteGame = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this game?")) return;
+    try {
+      await API.delete(`/games/${id}`);
+      setGames(games.filter((g) => g.id !== id));
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ message?: string }>;
+      const msg =
+        axiosErr.response?.data?.message ||
+        axiosErr.message ||
+        "Unknown error deleting game.";
+      alert("Error deleting game: " + msg);
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -60,33 +89,33 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <button onClick={onLogout}>Logout</button>
       </div>
 
-      <h3>Average: {avg}</h3>
+      <h3>Your games — avg: {avg}</h3>
 
       {/* Charts */}
       <div className="dashboard-charts">
-        <ChartWrapper 
-          title="Rolling Average" 
+        <ChartWrapper
+          title="Rolling Average"
           description="Shows your rolling average score over the last few games. Useful to see trends and improvement."
         >
           <RollingAverageChart games={sortedGames} />
         </ChartWrapper>
 
-        <ChartWrapper 
-          title="Score Distribution" 
+        <ChartWrapper
+          title="Score Distribution"
           description="Shows how often you score within certain ranges. Helps identify consistency or peaks."
         >
           <ScoreDistributionChart games={sortedGames} />
         </ChartWrapper>
 
-        <ChartWrapper 
-          title="Frame Breakdown" 
+        <ChartWrapper
+          title="Frame Breakdown"
           description="Shows your average score per frame. Helps identify which frames you do best in or need improvement."
         >
           <FrameBreakdownChart games={sortedGames} />
         </ChartWrapper>
 
-        <ChartWrapper 
-          title="Strikes, Spares, Opens" 
+        <ChartWrapper
+          title="Strikes, Spares, Opens"
           description="Pie chart showing your proportion of strikes, spares, and open frames. Helps evaluate performance patterns."
         >
           <StrikesSparesPieChart games={sortedGames} />
@@ -94,7 +123,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       </div>
 
       {/* Add game */}
-      <NewGameForm onGameCreated={(game) => setGames([...games, game])} />
+      <NewGameForm onGameCreated={handleGameCreated} />
 
       {/* Games list */}
       <div className="games-list">
@@ -111,9 +140,20 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                     <span>{g.label}</span>
                     <span>Score: {g.total_score ?? 0}</span>
                     <span>
-                      {g.played_at ? new Date(g.played_at).toLocaleDateString() : "N/A"}
+                      {g.played_at
+                        ? new Date(g.played_at).toLocaleDateString()
+                        : "N/A"}
                     </span>
                     <MiniScorecard rolls={g.rolls ?? []} />
+                    <div className="game-actions">
+                      <button onClick={() => setEditingGame(g)}>Edit</button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteGame(g.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -121,6 +161,15 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           ))
         )}
       </div>
+
+      {/* Edit modal */}
+      {editingGame && (
+        <EditGameForm
+          game={editingGame}
+          onClose={() => setEditingGame(null)}
+          onGameUpdated={handleGameUpdated}
+        />
+      )}
     </div>
   );
 }
